@@ -157,7 +157,7 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.admin_panel_settings, size: 24),
-                  label: const Text('แผงควบคุมแอดมิน'),
+                  label: const Text('แดชบอร์ดแอดมิน'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange[700],
                   ),
