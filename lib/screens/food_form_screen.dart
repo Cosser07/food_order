@@ -29,7 +29,7 @@ class _FoodFormScreenState extends State<FoodFormScreen> {
       _name = widget.food!.name;
       _description = widget.food!.description;
       _price = widget.food!.price;
-      _imageUrl = widget.food!.imageUrl;
+      _imageUrl = widget.food!.imageUrl ?? ''; // ใช้ ?? '' หาก imageUrl เป็น null
     } else {
       _name = '';
       _description = '';
@@ -44,7 +44,7 @@ class _FoodFormScreenState extends State<FoodFormScreen> {
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
-        _imageUrl = pickedFile.path;
+        _imageUrl = pickedFile.path; // บันทึกพาธไฟล์ท้องถิ่น
       });
     }
   }
@@ -61,7 +61,7 @@ class _FoodFormScreenState extends State<FoodFormScreen> {
             name: _name,
             description: _description,
             price: _price,
-            imageUrl: _imageUrl,
+            imageUrl: _imageUrl, // บันทึก imageUrl (พาธหรือ URL)
           ),
         );
       } else {
@@ -71,7 +71,7 @@ class _FoodFormScreenState extends State<FoodFormScreen> {
             name: _name,
             description: _description,
             price: _price,
-            imageUrl: _imageUrl,
+            imageUrl: _imageUrl, // บันทึก imageUrl (พาธหรือ URL)
           ),
         );
       }
@@ -182,15 +182,7 @@ class _FoodFormScreenState extends State<FoodFormScreen> {
                                 fit: BoxFit.cover,
                               )
                             : _imageUrl.isNotEmpty
-                                ? Image.file(
-                                    File(_imageUrl),
-                                    height: 200,
-                                    width: 200,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return _buildImagePlaceholder();
-                                    },
-                                  )
+                                ? _buildImageFromUrl(_imageUrl, context) // ใช้เมธอดใหม่
                                 : _buildImagePlaceholder(),
                       ),
                     ),
@@ -284,5 +276,40 @@ class _FoodFormScreenState extends State<FoodFormScreen> {
         color: Colors.grey,
       ),
     );
+  }
+
+  Widget _buildImageFromUrl(String imageUrl, BuildContext context) {
+    if (imageUrl.isNotEmpty) {
+      // ตรวจสอบว่า imageUrl เป็น URL หรือไม่ (เริ่มด้วย http หรือ https)
+      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+        return Image.network(
+          imageUrl,
+          height: 200,
+          width: 200,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildImagePlaceholder();
+          },
+        );
+      } else {
+        // หากไม่ใช่ URL (เช่น พาธไฟล์ท้องถิ่น) ลองใช้ Image.file
+        try {
+          return Image.file(
+            File(imageUrl),
+            height: 200,
+            width: 200,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildImagePlaceholder();
+            },
+          );
+        } catch (e) {
+          print('Error loading file image: $e');
+          return _buildImagePlaceholder();
+        }
+      }
+    } else {
+      return _buildImagePlaceholder();
+    }
   }
 }

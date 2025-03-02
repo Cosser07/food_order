@@ -6,14 +6,25 @@ class CartProvider with ChangeNotifier {
 
   List<FoodItem> get items => _items;
 
-  void addItem(String id, String name, double price, int quantity) {
+  void addItem(String id, String name, double price, int quantity, String imageUrl) {
     final existingIndex = _items.indexWhere((item) => item.id == id);
     if (existingIndex >= 0) {
-      _items[existingIndex].quantity = quantity; // แก้ไขตรงนี้เพื่อให้จำนวนถูกต้อง
+      // อัปเดตจำนวนสำหรับรายการที่มีอยู่
+      _items[existingIndex].quantity = quantity;
     } else {
-      _items.add(FoodItem(id: id, name: name, price: price, quantity: quantity, description: '', imageUrl: ''));
+      // เพิ่มรายการใหม่ พร้อม imageUrl
+      final foodItem = FoodItem(
+        id: id,
+        name: name,
+        price: price,
+        quantity: quantity,
+        description: '', // หากไม่มี description สามารถกำหนดเป็นค่าว่าง
+        imageUrl: imageUrl, // เก็บ imageUrl (พาธหรือ URL)
+      );
+      _items.add(foodItem);
     }
     notifyListeners();
+     // ดีบั๊กเพื่อตรวจสอบข้อมูล
   }
 
   void removeItem(String id) {
@@ -27,7 +38,7 @@ class CartProvider with ChangeNotifier {
   }
 
   double get totalAmount {
-    return _items.fold(0.0, (sum, item) => sum + item.price * item.quantity);
+    return _items.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
   }
 
   void clear() {

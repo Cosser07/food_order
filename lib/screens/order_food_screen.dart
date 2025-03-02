@@ -6,7 +6,7 @@ import '../provider/cart_provider.dart';
 class OrderFoodScreen extends StatefulWidget {
   final FoodItem food;
 
-  OrderFoodScreen({required this.food});
+  const OrderFoodScreen({required this.food});
 
   @override
   _OrderFoodScreenState createState() => _OrderFoodScreenState();
@@ -36,7 +36,7 @@ class _OrderFoodScreenState extends State<OrderFoodScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order ${widget.food.name}'),
+        title: Text('สั่ง ${widget.food.name}'), // แปลเป็นไทย
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -45,47 +45,53 @@ class _OrderFoodScreenState extends State<OrderFoodScreen> {
           children: [
             Text(
               widget.food.name,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(widget.food.description),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Price: \$${widget.food.price.toStringAsFixed(2)}'),
+                Text('ราคา: ฿${widget.food.price.toStringAsFixed(2)}'), // แปลและใช้ "฿"
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.remove),
+                      icon: const Icon(Icons.remove),
                       onPressed: _decrementQuantity,
                     ),
                     Text('$_quantity'),
                     IconButton(
-                      icon: Icon(Icons.add),
+                      icon: const Icon(Icons.add),
                       onPressed: _incrementQuantity,
                     ),
                   ],
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
-              'Total: \$${totalPrice.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              'รวม: ฿${totalPrice.toStringAsFixed(2)}', // แปลและใช้ "฿"
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
               onPressed: () {
-                cartProvider.addItem(widget.food.id, widget.food.name, widget.food.price, _quantity);
+                cartProvider.addItem(
+                  widget.food.id,
+                  widget.food.name,
+                  widget.food.price,
+                  _quantity,
+                  widget.food.imageUrl, // ส่ง imageUrl ไปยัง CartProvider
+                );
                 Navigator.of(context).pop();
               },
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                textStyle: TextStyle(fontSize: 18),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                textStyle: const TextStyle(fontSize: 18),
               ),
-              child: Center(
-                child: Text('Add to Cart'),
+              child: const Center(
+                child: Text('เพิ่มในตะกร้า'), // แปลเป็นไทย
               ),
             ),
           ],

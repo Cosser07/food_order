@@ -7,14 +7,25 @@ class OrderProvider with ChangeNotifier {
 
   List<OrderItem> get orders => _orders;
 
-  void addOrder(List<FoodItem> cartItems, double totalAmount) {
+  void addOrder(List<FoodItem> cartItems) {
+    // ตรวจสอบว่า cartItems ไม่ว่าง
+    if (cartItems.isEmpty) {
+      print('Warning: cartItems is empty, no order added.');
+      return;
+    }
+    // คำนวณ totalAmount จาก cartItems
+    double totalAmount = cartItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
     _orders.add(OrderItem(
       id: DateTime.now().toString(),
-      items: cartItems,
+      items: List<FoodItem>.from(cartItems), // ใช้ List.from เพื่อสร้างสำเนาใหม่
       totalAmount: totalAmount,
     ));
     notifyListeners();
+    print('Order added with items: $cartItems, Total Amount: $totalAmount');
   }
 
-  // ฟังก์ชัน approveOrder ถูกลบออกเนื่องจากไม่จำเป็นอีกต่อไป
+  void deleteOrder(String id) {
+    _orders.removeWhere((order) => order.id == id);
+    notifyListeners();
+  }
 }

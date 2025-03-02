@@ -66,14 +66,20 @@ class FoodListScreen extends StatelessWidget {
                   )
                 : ElevatedButton(
                     onPressed: () {
-                      cartProvider.addItem(food.id, food.name, food.price, 1);
+                      cartProvider.addItem(
+                        food.id,
+                        food.name,
+                        food.price,
+                        1, // ปริมาณเริ่มต้น 1
+                        food.imageUrl, // ส่ง imageUrl ไปยัง CartProvider
+                      );
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => OrderFoodScreen(food: food),
                         ),
                       );
                     },
-                    child: const Text('Order'),
+                    child: const Text('สั่ง'), // แปลเป็นไทย
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       textStyle: const TextStyle(fontSize: 16),

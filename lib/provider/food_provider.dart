@@ -9,6 +9,7 @@ class FoodProvider with ChangeNotifier {
   void addFood(FoodItem food) {
     _items.add(food);
     notifyListeners();
+    print('Added food: $food'); // ดีบั๊กเพื่อตรวจสอบข้อมูล
   }
 
   void updateFood(String id, FoodItem newFood) {
@@ -16,6 +17,7 @@ class FoodProvider with ChangeNotifier {
     if (index != -1) {
       _items[index] = newFood;
       notifyListeners();
+      print('Updated food: $newFood'); // ดีบั๊กเพื่อตรวจสอบข้อมูล
     }
   }
 
