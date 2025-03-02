@@ -9,8 +9,9 @@ import 'dart:io';
 
 class FoodListScreen extends StatelessWidget {
   final bool isAdmin;
+  final bool showPrice;
 
-  const FoodListScreen({Key? key, required this.isAdmin}) : super(key: key);
+  const FoodListScreen({Key? key, required this.isAdmin, this.showPrice = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,13 @@ class FoodListScreen extends StatelessWidget {
               food.name,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text(food.description),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(food.description),
+                if (showPrice) Text('฿${food.price.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+              ],
+            ),
             trailing: isAdmin
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
