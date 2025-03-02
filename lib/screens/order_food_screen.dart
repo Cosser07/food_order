@@ -77,17 +77,15 @@ class _OrderFoodScreenState extends State<OrderFoodScreen> {
             Spacer(),
             ElevatedButton(
               onPressed: () {
-                for (int i = 0; i < _quantity; i++) {
-                  cartProvider.addItem(widget.food);
-                }
+                cartProvider.addItem(widget.food.id, widget.food.name, widget.food.price, _quantity);
                 Navigator.of(context).pop();
               },
-              child: Center(
-                child: Text('Add to Cart'),
-              ),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 textStyle: TextStyle(fontSize: 18),
+              ),
+              child: Center(
+                child: Text('Add to Cart'),
               ),
             ),
           ],

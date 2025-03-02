@@ -12,4 +12,6 @@ class OrderItem {
     required this.totalAmount,
     this.isApproved = false,
   });
+
+  get amount => null;
 }

@@ -1,3 +1,4 @@
+import 'package:account/model/food_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/food_provider.dart';
@@ -58,7 +59,7 @@ class FoodListScreen extends StatelessWidget {
                   )
                 : ElevatedButton(
                     onPressed: () {
-                      cartProvider.addItem(food.id, food.name, food.price);
+                      cartProvider.addItem(food.id, food.name, food.price, 1);
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) => OrderFoodScreen(food: food),

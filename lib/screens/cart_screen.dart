@@ -1,3 +1,4 @@
+import 'package:account/model/food_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/cart_provider.dart';
@@ -10,6 +11,7 @@ class CartScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cartProvider = Provider.of<CartProvider>(context);
     final orderProvider = Provider.of<OrderProvider>(context);
+    final cartItems = cartProvider.items; // ใช้ cartProvider.items โดยตรง
 
     return Scaffold(
       appBar: AppBar(
@@ -33,19 +35,21 @@ class CartScreen extends StatelessWidget {
                     label: Text(
                       '\$${cartProvider.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
-                        color: Theme.of(context).primaryTextTheme.headline6!.color,
+                        color: Theme.of(context).primaryTextTheme.titleLarge?.color ?? Colors.white,
                       ),
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   TextButton(
-                    onPressed: () {
-                      orderProvider.addOrder(
-                        cartProvider.items.values.toList(),
-                        cartProvider.totalAmount,
-                      );
-                      cartProvider.clear();
-                    },
+                    onPressed: cartItems.isEmpty
+                        ? null
+                        : () {
+                            orderProvider.addOrder(
+                              cartItems,
+                              cartProvider.totalAmount,
+                            );
+                            cartProvider.clear();
+                          },
                     child: const Text('ORDER NOW'),
                   ),
                 ],
@@ -54,22 +58,25 @@ class CartScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: ListView.builder(
-              itemCount: cartProvider.items.length,
-              itemBuilder: (ctx, i) => ListTile(
-                leading: CircleAvatar(
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: FittedBox(
-                      child: Text('\$${cartProvider.items.values.toList()[i].price}'),
+            child: cartItems.isEmpty
+                ? const Center(child: Text("No items in the cart"))
+                : ListView.builder(
+                    itemCount: cartItems.length,
+                    itemBuilder: (ctx, i) => ListTile(
+                      leading: CircleAvatar(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: FittedBox(
+                            child: Text('\$${cartItems[i].price}'),
+                          ),
+                        ),
+                      ),
+                      title: Text(cartItems[i].name),
+                      subtitle: Text(
+                          'Total: \$${(cartItems[i].price * cartItems[i].quantity).toStringAsFixed(2)}'),
+                      trailing: Text('${cartItems[i].quantity} x'),
                     ),
                   ),
-                ),
-                title: Text(cartProvider.items.values.toList()[i].name),
-                subtitle: Text('Total: \$${(cartProvider.items.values.toList()[i].price * cartProvider.items.values.toList()[i].quantity).toStringAsFixed(2)}'),
-                trailing: Text('${cartProvider.items.values.toList()[i].quantity} x'),
-              ),
-            ),
           ),
         ],
       ),

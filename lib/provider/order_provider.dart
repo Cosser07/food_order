@@ -16,11 +16,5 @@ class OrderProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void approveOrder(String id) {
-    final index = _orders.indexWhere((order) => order.id == id);
-    if (index != -1) {
-      _orders[index].isApproved = true;
-      notifyListeners();
-    }
-  }
+  // ฟังก์ชัน approveOrder ถูกลบออกเนื่องจากไม่จำเป็นอีกต่อไป
 }

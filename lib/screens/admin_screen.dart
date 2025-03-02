@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'food_form_screen.dart';
 import 'food_list_screen.dart';
-import 'order_approval_screen.dart';
+import 'order_history_screen.dart';
 
 class AdminScreen extends StatelessWidget {
   @override
@@ -14,7 +14,7 @@ class AdminScreen extends StatelessWidget {
             icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const FoodFormScreen()),
+                MaterialPageRoute(builder: (context) => FoodFormScreen()),
               );
             },
           ),
@@ -22,16 +22,16 @@ class AdminScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          const Expanded(child: FoodListScreen(isAdmin: true)), // ส่ง isAdmin เพื่อแยกระหว่าง Admin กับ User
+          const Expanded(child: FoodListScreen(isAdmin: true)),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => OrderApprovalScreen()),
+                  MaterialPageRoute(builder: (context) => OrderHistoryScreen()),
                 );
               },
-              child: const Text('Approve Orders'),
+              child: const Text('View Order History'),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 textStyle: const TextStyle(fontSize: 18),

@@ -4,6 +4,7 @@ class FoodItem {
   String description;
   double price;
   String imageUrl;
+  int quantity; // เพิ่มฟิลด์ quantity
 
   FoodItem({
     required this.id,
@@ -11,5 +12,6 @@ class FoodItem {
     required this.description,
     required this.price,
     required this.imageUrl,
+    this.quantity = 1, // กำหนดค่าเริ่มต้นให้ quantity
   });
 }
