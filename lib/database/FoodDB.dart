@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:account/model/food_item.dart';
+import 'package:foodonlineshop/model/food_item.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sembast/sembast.dart';

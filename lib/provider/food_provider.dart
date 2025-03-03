@@ -1,4 +1,4 @@
-import 'package:account/database/FoodDB.dart';
+import 'package:foodonlineshop/database/FoodDB.dart';
 import 'package:flutter/material.dart';
 import '../model/food_item.dart';
 import '../database/FoodDB.dart';

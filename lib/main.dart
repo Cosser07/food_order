@@ -142,7 +142,7 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const Text(
-                        'ยินดีต้อนรับสู่ FastFoodNU 🍛',
+                        'ยินดีต้อนรับสู่ FastFoodNU ',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,
