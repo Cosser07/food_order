@@ -7,11 +7,27 @@ import 'food_form_screen.dart';
 import 'order_food_screen.dart';
 import 'dart:io';
 
-class FoodListScreen extends StatelessWidget {
+class FoodListScreen extends StatefulWidget {
   final bool isAdmin;
   final bool showPrice;
 
   const FoodListScreen({Key? key, required this.isAdmin, this.showPrice = false}) : super(key: key);
+
+  @override
+  State<FoodListScreen> createState() => _FoodListScreenState();
+}
+
+class _FoodListScreenState extends State<FoodListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _loadFoods();
+  }
+
+  Future<void> _loadFoods() async {
+    final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+    await foodProvider.loadFoods();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,10 +55,10 @@ class FoodListScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(food.description),
-                if (showPrice) Text('฿${food.price.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                if (widget.showPrice) Text('฿${food.price.toStringAsFixed(2)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
               ],
             ),
-            trailing: isAdmin
+            trailing: widget.isAdmin
                 ? Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -58,8 +74,9 @@ class FoodListScreen extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
+                        tooltip: 'ลบเมนูอาหาร',
                         onPressed: () {
-                          foodProvider.deleteFood(food.id);
+                          _showDeleteConfirmationDialog(context, foodProvider, food.id);
                         },
                       ),
                     ],
@@ -88,6 +105,29 @@ class FoodListScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, FoodProvider foodProvider, String foodId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('ยืนยันการลบ'),
+        content: const Text('คุณแน่ใจหรือไม่ว่าต้องการลบเมนูนี้?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('ยกเลิก'),
+          ),
+          TextButton(
+            onPressed: () {
+              foodProvider.deleteFood(foodId);
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('ลบ', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
     );
   }
 }

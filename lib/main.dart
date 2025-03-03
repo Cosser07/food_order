@@ -6,12 +6,31 @@ import 'provider/order_provider.dart';
 import 'screens/admin_screen.dart';
 import 'screens/user_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // ต้องเรียกนี้สำหรับการใช้งาน async ใน main
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    final foodProvider = Provider.of<FoodProvider>(context, listen: false);
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    await foodProvider.loadFoods();
+    await orderProvider.loadOrders();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +77,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// HomeScreen ยังคงเดิมตามที่คุณให้มา
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -122,7 +142,7 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       const Text(
-                        'ยินดีต้อนรับสู่ Delicious Bites! 🍕',
+                        'ยินดีต้อนรับสู่ FastFoodNU 🍛',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,

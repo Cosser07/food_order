@@ -9,22 +9,20 @@ class CartProvider with ChangeNotifier {
   void addItem(String id, String name, double price, int quantity, String imageUrl) {
     final existingIndex = _items.indexWhere((item) => item.id == id);
     if (existingIndex >= 0) {
-      // อัปเดตจำนวนสำหรับรายการที่มีอยู่
       _items[existingIndex].quantity = quantity;
     } else {
-      // เพิ่มรายการใหม่ พร้อม imageUrl
       final foodItem = FoodItem(
         id: id,
         name: name,
         price: price,
         quantity: quantity,
-        description: '', // หากไม่มี description สามารถกำหนดเป็นค่าว่าง
-        imageUrl: imageUrl, // เก็บ imageUrl (พาธหรือ URL)
+        description: '',
+        imageUrl: imageUrl,
       );
       _items.add(foodItem);
     }
     notifyListeners();
-     // ดีบั๊กเพื่อตรวจสอบข้อมูล
+    
   }
 
   void removeItem(String id) {

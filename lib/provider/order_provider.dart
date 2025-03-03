@@ -7,25 +7,20 @@ class OrderProvider with ChangeNotifier {
 
   List<OrderItem> get orders => _orders;
 
-  void addOrder(List<FoodItem> cartItems) {
-    // ตรวจสอบว่า cartItems ไม่ว่าง
-    if (cartItems.isEmpty) {
-      print('Warning: cartItems is empty, no order added.');
-      return;
-    }
-    // คำนวณ totalAmount จาก cartItems
-    double totalAmount = cartItems.fold(0.0, (sum, item) => sum + (item.price * item.quantity));
+  void addOrder(List<FoodItem> cartItems, double totalAmount) {
     _orders.add(OrderItem(
       id: DateTime.now().toString(),
-      items: List<FoodItem>.from(cartItems), // ใช้ List.from เพื่อสร้างสำเนาใหม่
+      items: List.from(cartItems), // เพิ่มรายการอาหารเข้าไปในคำสั่งซื้อ
       totalAmount: totalAmount,
+      timestamp: DateTime.now(), // กำหนดค่า timestamp
     ));
     notifyListeners();
-    print('Order added with items: $cartItems, Total Amount: $totalAmount');
   }
 
-  void deleteOrder(String id) {
-    _orders.removeWhere((order) => order.id == id);
+  Future<void> loadOrders() async {
+    // โหลดคำสั่งซื้อจากฐานข้อมูลหรือแหล่งข้อมูลอื่นๆ
+    // ตัวอย่าง:
+    // _orders = await _orderDB.loadAllOrders();
     notifyListeners();
   }
 }

@@ -187,7 +187,7 @@ class CartScreen extends StatelessWidget {
                               // ตรวจสอบและพิมพ์ข้อมูลก่อนส่ง
                               print('Cart Items before ordering: $cartItems');
                               if (cartItems.isNotEmpty) {
-                                orderProvider.addOrder(cartItems);
+                                orderProvider.addOrder(cartItems, cartProvider.totalAmount);
                                 cartProvider.clear();
                               } else {
                                 print('Error: Cart is empty, cannot place order.');

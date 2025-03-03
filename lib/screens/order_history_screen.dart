@@ -2,13 +2,34 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/order_provider.dart';
+import 'package:intl/intl.dart';
 
-class OrderHistoryScreen extends StatelessWidget {
+class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
+
+  @override
+  State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
+}
+
+class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadOrders();
+    });
+  }
+
+  Future<void> _loadOrders() async {
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    await orderProvider.loadOrders();
+  }
 
   @override
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context);
+    final sortedOrders = orderProvider.orders.toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp)); // เรียงลำดับจากใหม่ไปเก่า
 
     return Scaffold(
       appBar: AppBar(
@@ -47,7 +68,7 @@ class OrderHistoryScreen extends StatelessWidget {
             colors: [Colors.orange[50]!, Colors.orange[100]!],
           ),
         ),
-        child: orderProvider.orders.isEmpty
+        child: sortedOrders.isEmpty
             ? const Center(
                 child: Text(
                   'ไม่มีคำสั่งซื้อที่ผ่านมา',
@@ -60,17 +81,12 @@ class OrderHistoryScreen extends StatelessWidget {
               )
             : ListView.builder(
                 padding: const EdgeInsets.all(16.0),
-                itemCount: orderProvider.orders.length,
+                itemCount: sortedOrders.length,
                 itemBuilder: (ctx, i) {
-                  final order = orderProvider.orders[i];
-                  print('Order ${i + 1} Items: ${order.items.map((item) => {
-                    'id': item.id,
-                    'name': item.name,
-                    'quantity': item.quantity,
-                    'price': item.price,
-                    'imageUrl': item.imageUrl,
-                  }).toList()}');
-                  print('Order ${i + 1} Total Amount: ${order.totalAmount}');
+                  final order = sortedOrders[i];
+                  final orderNumber = sortedOrders.length - i; // กำหนดลำดับใหม่ให้เลขน้อยคือสั่งก่อน
+                  final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(order.timestamp);
+
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -87,165 +103,97 @@ class OrderHistoryScreen extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                          dividerColor: Colors.transparent,
-                        ),
-                        child: ExpansionTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.redAccent,
-                            radius: 20,
-                            child: Text(
-                              '#${i + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            'คำสั่งซื้อที่ ${i + 1}',
+                      child: ExpansionTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.redAccent,
+                          radius: 20,
+                          child: Text(
+                            '#$orderNumber',
                             style: const TextStyle(
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: Colors.redAccent,
+                              fontSize: 16,
                             ),
                           ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 8, bottom: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'ยอดรวม: ${order.totalAmount.toStringAsFixed(2)} บาท',
-                                  style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  'เวลา: ${order.id}',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
+                        ),
+                        title: Text(
+                          'คำสั่งซื้อที่ $orderNumber',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.redAccent,
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            tooltip: 'ลบคำสั่งซื้อ',
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (ctx) => AlertDialog(
-                                  title: const Text('ยืนยันการลบ'),
-                                  content: Text('คุณต้องการลบคำสั่งซื้อที่ ${i + 1} หรือไม่?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(ctx).pop(),
-                                      child: const Text('ยกเลิก'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        orderProvider.deleteOrder(order.id);
-                                        Navigator.of(ctx).pop();
-                                      },
-                                      child: const Text('ลบ', style: TextStyle(color: Colors.red)),
-                                    ),
-                                  ],
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 8, bottom: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'ยอดรวม: ${order.totalAmount.toStringAsFixed(2)} บาท',
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              );
-                            },
+                              ),
+                              Text(
+                                'เวลา: $formattedDate',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
                           ),
-                          children: order.items.isEmpty
-                              ? [
-                                  Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Center(
-                                      child: Text(
-                                        'ไม่มีรายการในคำสั่งซื้อนี้',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                        ),
+                        children: order.items.isNotEmpty
+                            ? order.items.map((item) {
+                                return ListTile(
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: _buildImageFromUrl(item.imageUrl, context),
+                                  ),
+                                  title: Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  subtitle: Text(
+                                    'ราคา: ${item.price.toStringAsFixed(2)} บาท | จำนวน: ${item.quantity}',
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  trailing: Text(
+                                    'รวม: ${(item.price * item.quantity).toStringAsFixed(2)} บาท',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.redAccent,
+                                    ),
+                                  ),
+                                );
+                              }).toList()
+                            : [
+                                Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Center(
+                                    child: Text(
+                                      '⚠ ไม่มีรายการอาหารในคำสั่งซื้อนี้',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.redAccent,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ),
-                                ]
-                              : [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
-                                    child: Column(
-                                      children: order.items.map((item) {
-                                        return Container(
-                                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                          padding: const EdgeInsets.all(16),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.orange.withOpacity(0.1),
-                                                blurRadius: 5,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: _buildImageFromUrl(item.imageUrl, context),
-                                              ),
-                                              const SizedBox(width: 16),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      item.name,
-                                                      style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 18,
-                                                        color: Colors.black87,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 8),
-                                                    Text(
-                                                      'ราคา: ${item.price.toStringAsFixed(2)} บาท | จำนวน: ${item.quantity}',
-                                                      style: TextStyle(
-                                                        color: Colors.grey[700],
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 4),
-                                                    Text(
-                                                      'รวม: ${(item.price * item.quantity).toStringAsFixed(2)} บาท',
-                                                      style: const TextStyle(
-                                                        fontWeight: FontWeight.bold,
-                                                        fontSize: 16,
-                                                        color: Colors.redAccent,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ],
-                          collapsedBackgroundColor: Colors.white,
-                          backgroundColor: Colors.white,
-                        ),
+                                ),
+                              ],
                       ),
                     ),
                   );
@@ -257,40 +205,33 @@ class OrderHistoryScreen extends StatelessWidget {
 
   Widget _buildImageFromUrl(String? imageUrl, BuildContext context) {
     if (imageUrl != null && imageUrl.isNotEmpty) {
-      // ตรวจสอบว่า imageUrl เป็น URL หรือไม่ (เริ่มด้วย http หรือ https)
-      if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      if (imageUrl.startsWith('http')) {
         return Image.network(
           imageUrl,
           width: 60,
           height: 60,
           fit: BoxFit.cover,
           errorBuilder: (context, error, stackTrace) {
-            return _buildPlaceholderImage(context);
+            return _buildPlaceholderImage();
           },
         );
       } else {
-        // หากไม่ใช่ URL (เช่น พาธไฟล์ท้องถิ่น) ลองใช้ Image.file
-        try {
-          return Image.file(
-            File(imageUrl),
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return _buildPlaceholderImage(context);
-            },
-          );
-        } catch (e) {
-          print('Error loading file image: $e');
-          return _buildPlaceholderImage(context);
-        }
+        return Image.file(
+          File(imageUrl),
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildPlaceholderImage();
+          },
+        );
       }
     } else {
-      return _buildPlaceholderImage(context);
+      return _buildPlaceholderImage();
     }
   }
 
-  Widget _buildPlaceholderImage(BuildContext context) {
+  Widget _buildPlaceholderImage() {
     return Container(
       width: 60,
       height: 60,
